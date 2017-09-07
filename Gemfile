@@ -58,7 +58,7 @@ gem 'yajl-ruby', platform: 'ruby'
 gem 'json', platform: 'jruby'
 
 group :development, :test do
-  gem 'airbrake', '~> 4.3.5', require: false
+  gem 'airbrake', '~> 6.2.1', require: false
   gem 'pry-rails'
   gem 'pry-byebug', platforms: [:mri]
   gem 'quiet_assets'
