@@ -149,9 +149,9 @@ GEM
     hipchat (1.5.1)
       httparty
       mimemagic
-    hoi (0.0.6)
-      httparty (> 0.6.0)
-      json (> 1.4.0)
+    hoi (0.0.7)
+      httparty
+      json
     hoptoad_notifier (2.4.11)
       activesupport
       builder
