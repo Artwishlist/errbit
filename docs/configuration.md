@@ -38,7 +38,7 @@ In order of precedence Errbit uses:
 <dd>The value that should be set in the 'from' field for outgoing emails
 <dd>defaults to errbit@example.com
 <dt>ERRBIT_EMAIL_AT_NOTICES
-<dd>Errbit notifies watchers via email after the set number of occurances of the same error
+<dd>Errbit notifies watchers via email after the set number of occurances of the same error. [0] means notify on every occurance.
 <dd>defaults to [1,10,100]
 <dt>ERRBIT_PER_APP_EMAIL_AT_NOTICES
 <dd>Let every application have it's own configuration rather than using ERRBIT_EMAIL_AT_NOTICES. If this value is true, you can configure each app using the web UI.
@@ -49,6 +49,9 @@ In order of precedence Errbit uses:
 <dt>ERRBIT_PER_APP_NOTIFY_AT_NOTICES
 <dd>Let every application have it's own configuration rather than using ERRBIT_NOTIFY_AT_NOTICES. If this value is set to true, you can configure each app using the web UI.
 <dd>defaults to false
+<dt>ERRBIT_PROBLEM_DESTROY_AFTER_DAYS
+<dd>Number of days to keep errors in the database when running rake errbit:clear_outdated
+<dd>defaults to nil (off)
 <dt>SERVE_STATIC_ASSETS
 <dd>Allow Rails to serve static assets. For most production environments, this should be false because your web server should be configured to serve static assets for you. But some environments like Heroku require this to be true.
 <dd>defaults to true
@@ -103,6 +106,10 @@ In order of precedence Errbit uses:
 <dd>Password for SMTP auth, you could also set SENDGRID_PASSWORD
 <dt>SMTP_DOMAIN
 <dd>HELO domain to set for outgoing SMTP messages, you can also use SENDGRID_DOMAIN
+<dt>SMTP_ENABLE_STARTTLS_AUTO
+<dd>Detects if STARTTLS is enabled in your SMTP server and starts to use it
+<dt>SMTP_OPENSSL_VERIFY_MODE
+<dd>When using TLS, you can set how OpenSSL checks the certificate. This is really useful if you need to validate a self-signed and/or a wildcard certificate. You can use the name of an OpenSSL verify constant ('none', 'peer', 'client_once', 'fail_if_no_peer_cert').
 <dt>SENDMAIL_LOCATION
 <dd>Path to sendmail
 <dt>SENDMAIL_ARGUMENTS

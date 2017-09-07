@@ -1,9 +1,3 @@
-##
-# Manage problems
-#
-# List of actions available :
-# MEMBER => :show, :edit, :update, :create, :destroy, :resolve, :unresolve, :create_issue, :unlink_issue
-# COLLECTION => :index, :all, :destroy_several, :resolve_several, :unresolve_several, :merge_several, :unmerge_several, :search
 class ProblemsController < ApplicationController
   include ProblemsSearcher
 
@@ -32,17 +26,14 @@ class ProblemsController < ApplicationController
   end
 
   expose(:problems) do
-    pro = Problem.
+    finder = Problem.
       for_apps(app_scope).
       in_env(params_environement).
       all_else_unresolved(all_errs).
       ordered_by(params_sort, params_order)
 
-    if request.format == :html
-      pro.page(params[:page]).per(current_user.per_page)
-    else
-      pro
-    end
+    finder = finder.search(params[:search]) if params[:search].present?
+    finder.page(params[:page]).per(current_user.per_page)
   end
 
   def index; end
@@ -117,22 +108,20 @@ class ProblemsController < ApplicationController
   end
 
   def destroy_several
-    nb_problem_destroy = ProblemDestroy.execute(selected_problems)
-    flash[:notice] = "#{I18n.t(:n_errs_have, count: nb_problem_destroy)} #{I18n.t('n_errs_have.been_deleted')}."
+    DestroyProblemsByIdJob.perform_later(selected_problems_ids)
+    flash[:notice] = "#{I18n.t(:n_errs, count: selected_problems.size)} #{I18n.t('n_errs.will_be_deleted')}."
     redirect_to :back
   end
 
   def destroy_all
-    nb_problem_destroy = ProblemDestroy.execute(app.problems)
-    flash[:success] = "#{I18n.t(:n_errs_have, count: nb_problem_destroy)} #{I18n.t('n_errs_have.been_deleted')}."
+    DestroyProblemsByAppJob.perform_later(app.id)
+    flash[:success] = "#{I18n.t(:n_errs, count: app.problems.count)} #{I18n.t('n_errs.will_be_deleted')}."
     redirect_to :back
   rescue ActionController::RedirectBackError
     redirect_to app_path(app)
   end
 
   def search
-    ps = Problem.search(params[:search]).for_apps(app_scope).in_env(params[:environment]).all_else_unresolved(params[:all_errs]).ordered_by(params_sort, params_order)
-    self.problems = ps.page(params[:page]).per(current_user.per_page)
     respond_to do |format|
       format.html { render :index }
       format.js

@@ -1,30 +1,50 @@
-FROM alpine:3.4
+FROM ruby:2.3.3-alpine
 MAINTAINER David Papp <david@ghostmonitor.com>
 
+RUN addgroup -S errbit \
+  && adduser -S -D -s /bin/false -G errbit -g errbit errbit
 
-RUN apk --update add \
-  build-base ruby-dev libc-dev linux-headers \
-  libffi-dev zlib-dev \
-  ca-certificates \
-  ruby \
-  ruby-bundler \
-  ruby-io-console \
-  ruby-bigdecimal \
-  curl \
-  bash \
-  nodejs \
-  tzdata \
-  ruby-dev && \
-  rm -fr /usr/share/ri
-COPY . /app
-RUN apk --update add --virtual build_deps \
-    build-base ruby-dev libc-dev linux-headers \
-    openssl-dev postgresql-dev libxml2-dev libxslt-dev
-RUN cd app && \
-bundle config build.nokogiri --use-system-libraries && \
-bundle install --without test development no_docker && \
-bundle exec rake assets:precompile
+# throw errors if Gemfile has been modified since Gemfile.lock
+RUN echo "gem: --no-document" >> /etc/gemrc \
+  && bundle config --global frozen 1 \
+  && bundle config --global clean true \
+  && bundle config --global disable_shared_gems false
 
+RUN mkdir -p /app \
+  && chown -R errbit:errbit /app \
+  && chmod 700 /app/
 WORKDIR /app
+
+RUN gem update --system \
+  && gem install bundler \
+  && apk add --no-cache \
+    curl \
+    less \
+    libxml2-dev \
+    libxslt-dev \
+    nodejs \
+    tzdata
+
+EXPOSE 8080
+
+COPY ["Gemfile", "Gemfile.lock", "/app/"]
+
+RUN apk add --no-cache --virtual build-dependencies \
+      build-base \
+  && bundle config build.nokogiri --use-system-libraries \
+  && bundle install \
+      -j "$(getconf _NPROCESSORS_ONLN)" \
+      --retry 5 \
+      --without test development no_docker \
+  && apk del build-dependencies
+
+COPY . /app
+
+RUN RAILS_ENV=production bundle exec rake assets:precompile
+RUN chown -R errbit:errbit /app
+
+USER errbit
+
+HEALTHCHECK CMD curl --fail http://localhost:$PORT/users/sign_in || exit 1
 
 CMD ["bundle","exec","puma","-C","config/puma.default.rb"]

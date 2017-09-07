@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-RAILS_VERSION = '~> 4.2.5.2'
+RAILS_VERSION = '~> 4.2.8'
 
 send :ruby, ENV['GEMFILE_RUBY_VERSION'] if ENV['GEMFILE_RUBY_VERSION']
 
@@ -71,17 +71,14 @@ group :development do
   gem 'capistrano-rails',   require: false
   gem 'capistrano-rbenv',   require: false
   gem 'capistrano3-puma',   require: false
-
-
-  # better errors
   gem 'better_errors'
   gem 'binding_of_caller', platform: 'ruby'
   gem 'meta_request'
 end
 
 group :test do
-  gem 'rspec', '~> 3.3'
-  gem 'rspec-rails', '~> 3.0', require: false
+  gem 'rspec', '~> 3.5'
+  gem 'rspec-rails', '~> 3.5', require: false
   gem 'rspec-activemodel-mocks'
   gem 'rspec-its'
   gem 'mongoid-rspec', '~> 3.0.0', require: false
@@ -100,7 +97,7 @@ group :heroku, :production do
 end
 
 group :no_docker, :test, :development do
- gem 'therubyracer', :platform => :ruby # C Ruby (MRI) or Rubinius, but NOT Windows
+  gem 'therubyracer', platform: :ruby # C Ruby (MRI) or Rubinius, but NOT Windows
 end
 
 gem 'puma'
@@ -111,6 +108,8 @@ gem 'uglifier'
 gem 'jquery-rails', '~> 2.1.4'
 gem 'pjax_rails'
 gem 'underscore-rails'
+
+gem 'sucker_punch'
 
 ENV['USER_GEMFILE'] ||= './UserGemfile'
 eval_gemfile ENV['USER_GEMFILE'] if File.exist?(ENV['USER_GEMFILE'])
