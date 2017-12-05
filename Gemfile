@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-RAILS_VERSION = '~> 4.2.8'
+RAILS_VERSION = '~> 4.2.9'
 
 send :ruby, ENV['GEMFILE_RUBY_VERSION'] if ENV['GEMFILE_RUBY_VERSION']
 
@@ -58,7 +58,7 @@ gem 'yajl-ruby', platform: 'ruby'
 gem 'json', platform: 'jruby'
 
 group :development, :test do
-  gem 'airbrake', '~> 6.2.1', require: false
+  gem 'airbrake', '~> 4.3.5', require: false
   gem 'pry-rails'
   gem 'pry-byebug', platforms: [:mri]
   gem 'quiet_assets'
